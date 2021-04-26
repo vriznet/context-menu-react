@@ -1,29 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import DetailsContainer from './DetailsContainer.jsx';
+import dummyData from './dummyData.js'
 import './app.css';
-import logo from '../public/logo.png'; 
 
-class App extends React.Component {	
-  render() {
-    return (
-      <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/app.jsx</code> and tap.... on the play button.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-    )
+const App = () => {
+  const [openedIndex, setOpenedIndex] = useState(null);
+  const togglePopover = (index) => (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpenedIndex(index);
   }
-}
+  const closeAll = ({ target }) => {
+    target.nodeName !== 'P' && setOpenedIndex(null);
+  }
+  useEffect(() => {
+    document.body.addEventListener('click', closeAll);
+    return () => {
+      document.body.removeEventListener('click', closeAll);
+    }
+  },[openedIndex]);
+  return (
+    <>
+      {dummyData.map(({ text, context }, index) => (
+        <DetailsContainer summary={text} context={context} key={index} open={openedIndex === index} togglePopover={togglePopover(index)} />
+      ))}
+    </>
+  )
+};
 
 ReactDOM.render(<App />, document.getElementById('root'));
